@@ -82,5 +82,5 @@ if __name__ == '__main__':
     # result = get_score(2, 1, 300, 0.08, 0.01, 400)
     # for epoch in [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]:
     dataset_dir = './static/processed/v6/'
-    result = get_score(2, 1, 600, 0.08, 0.01, 600, dataset_dir)
+    result = get_score(2, 1, 600, 0.08, 0.01, 300, dataset_dir)
     print(json.dumps(result))
