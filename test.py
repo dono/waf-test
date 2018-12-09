@@ -1,19 +1,12 @@
-import numpy as np
+import urllib.parse
+import re
 
+ascii_symbols = r'[ -/:-@[-`{-~]' # asciiコード中の記号(スペース含む)とマッチする正規表現
+ascii_control_chars = r'[\x00-\x1f]|\x7f' # asciiコード中の制御文字とマッチする正規表現
+reg = re.compile('({}|{})'.format(ascii_symbols, ascii_control_chars))
 
-def cos_sim(v1, v2):
-    return np.dot(v1, v2) / (np.linalg.norm(v1) * np.linalg.norm(v2))
+str = 'id=2&nombre=Jam%F3n+Ib%E9rico&precio=85&cantidad=%27%3B+DROP+TABLE+usuarios%3B+SELECT+*+FROM+datos+WHERE+nombre+LIKE+%27%25&B1=A%F1adir+al+carrito'
+str = urllib.parse.unquote_plus(str)
 
-def cos_sim_norm(v1, v2):
-    return np.dot(v1, v2)
-
-
-if __name__ == '__main__':
-    x1 = np.array([1, 2, 3, 4])
-    x2 = np.array([1, 2, 6, 5])
-
-    sim1 = cos_sim(x1, x2)
-    sim2 = cos_sim(x1 / np.linalg.norm(x1), x2 / np.linalg.norm(x2))
-
-    print(sim1)
-    print(sim2)
+arr = reg.split(str)
+print(arr)
