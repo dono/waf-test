@@ -1,6 +1,7 @@
 import re
 import gzip
 import imp
+import time
 import urllib.parse
 import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
@@ -62,7 +63,7 @@ if __name__ == '__main__':
 
     kf = KFold(n_splits=10, shuffle=True, random_state=0)
 
-    result_sum = {'Accuracy': 0, 'Precision': 0, 'Recall': 0}
+    result_sum = {'Accuracy': 0, 'Precision': 0, 'Recall': 0, 'Time': 0}
     for train_idx, test_idx in kf.split(X):
         y_train, y_test = y[train_idx], y[test_idx]
 
@@ -78,7 +79,9 @@ if __name__ == '__main__':
         clf = RandomForestClassifier(random_state=0, n_estimators=10, n_jobs=6)
         clf.fit(X_train, y_train)
 
+        start = time.time()
         y_pred = clf.predict(X_test)
+        Time = (time.time() - start) / len(train_idx) * 1000 # 1件あたりの処理時間(msec)
 
         Accuracy = accuracy_score(y_test, y_pred)
         Precision = precision_score(y_test, y_pred, pos_label='norm')
@@ -87,7 +90,10 @@ if __name__ == '__main__':
         result_sum['Accuracy'] += Accuracy
         result_sum['Precision'] += Precision
         result_sum['Recall'] += Recall
+        result_sum['Time'] += Time
 
-    print('Accuracy:  {0:.4f}'.format(Accuracy))
-    print('Precision: {0:.4f}'.format(Precision))
-    print('Recall:    {0:.4f}'.format(Recall))
+
+    print('Accuracy:  {0:.4f}'.format(result_sum['Accuracy'] / kf.get_n_splits()))
+    print('Precision: {0:.4f}'.format(result_sum['Precision'] / kf.get_n_splits()))
+    print('Recall:    {0:.4f}'.format(result_sum['Recall'] / kf.get_n_splits()))
+    print('Time:      {0:.4f}'.format(result_sum['Time'] / kf.get_n_splits()))
