@@ -37,20 +37,20 @@ def text2words(str):
     method, url, _ = arr[0].split(' ')
     u = urllib.parse.urlparse(url)
 
-    payload = ''
+    param = ''
     if method == 'GET':
-        payload = u.query
+        param = u.query
     elif method == 'POST' or method == 'PUT':
         for line in reversed(arr):
             if line == '':
                 continue
             else:
-                payload = line
+                param = line
                 break
 
-    payload = urllib.parse.unquote_plus(payload) # decoding
+    param = urllib.parse.unquote_plus(param) # decoding
 
-    words = split_text(u.path) + split_text(payload)
+    words = split_text(u.path) + split_text(param)
     return words
 
 
