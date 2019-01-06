@@ -7,6 +7,7 @@ import numpy as np
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.model_selection import KFold
 from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import precision_score
 from sklearn.metrics import recall_score
@@ -63,7 +64,7 @@ if __name__ == '__main__':
 
     kf = KFold(n_splits=10, shuffle=True, random_state=0)
 
-    result_sum = {'Accuracy': 0, 'Precision': 0, 'Recall': 0, 'Time': 0}
+    result_sum = {'Accuracy': 0, 'Precision': 0, 'Recall': 0, 'FPR': 0, 'Time': 0}
     for train_idx, test_idx in kf.split(X):
         y_train, y_test = y[train_idx], y[test_idx]
 
@@ -80,20 +81,21 @@ if __name__ == '__main__':
         clf.fit(X_train, y_train)
 
         start = time.time()
-        y_pred = clf.predict(X_test)
-        Time = (time.time() - start) / len(train_idx) * 1000 # 1件あたりの処理時間(msec)
+        y_pred = clf.predict(X_test) # 分類
+        process_time = (time.time() - start) / len(test_idx) * 1000 # 1件あたりの平均処理時間(msec)
 
-        Accuracy = accuracy_score(y_test, y_pred)
-        Precision = precision_score(y_test, y_pred, pos_label='norm')
-        Recall = recall_score(y_test, y_pred, pos_label='norm')
+        matrix = confusion_matrix(y_test, y_pred)
+        FP = matrix[1][0]
+        TN = matrix[1][1]
 
-        result_sum['Accuracy'] += Accuracy
-        result_sum['Precision'] += Precision
-        result_sum['Recall'] += Recall
-        result_sum['Time'] += Time
-
+        result_sum['Accuracy'] += accuracy_score(y_test, y_pred)
+        result_sum['Precision'] += precision_score(y_test, y_pred, pos_label='norm')
+        result_sum['Recall'] += recall_score(y_test, y_pred, pos_label='norm')
+        result_sum['FPR'] += (FP / (TN + FP))
+        result_sum['Time'] += process_time
 
     print('Accuracy:  {0:.4f}'.format(result_sum['Accuracy'] / kf.get_n_splits()))
     print('Precision: {0:.4f}'.format(result_sum['Precision'] / kf.get_n_splits()))
     print('Recall:    {0:.4f}'.format(result_sum['Recall'] / kf.get_n_splits()))
+    print('FPR:       {0:.4f}'.format(result_sum['FPR'] / kf.get_n_splits()))
     print('Time:      {0:.4f}'.format(result_sum['Time'] / kf.get_n_splits()))
