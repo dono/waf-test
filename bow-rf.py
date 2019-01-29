@@ -84,13 +84,13 @@ if __name__ == '__main__':
         y_pred = clf.predict(X_test) # 分類
         process_time = (time.time() - start) / len(test_idx) * 1000 # 1件あたりの平均処理時間(msec)
 
-        matrix = confusion_matrix(y_test, y_pred)
+        matrix = confusion_matrix(y_test, y_pred, labels=['anom', 'norm'])
         FP = matrix[1][0]
         TN = matrix[1][1]
 
         result_sum['Accuracy'] += accuracy_score(y_test, y_pred)
-        result_sum['Precision'] += precision_score(y_test, y_pred, pos_label='norm')
-        result_sum['Recall'] += recall_score(y_test, y_pred, pos_label='norm')
+        result_sum['Precision'] += precision_score(y_test, y_pred, pos_label='anom')
+        result_sum['Recall'] += recall_score(y_test, y_pred, pos_label='anom')
         result_sum['FPR'] += (FP / (TN + FP))
         result_sum['Time'] += process_time
 
